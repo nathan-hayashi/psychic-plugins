@@ -1,0 +1,9 @@
+# Runtime never ships (S1-PLUGINS-WEB: the fence every sibling carries; this repo was the only
+# one without it, and it flips public at S1B — an unignored drop at the root is the recorded
+# CONTEXT-TRANSFER class).
+.env
+.env.*
+logs/
+*.log
+.claude/state/
+scratch/

@@ -35,27 +35,18 @@ chk_skillfront () { # $1=SKILL.md path, $2=expected dir name ("" to skip the dir
 }
 
 echo "== A. structure =="
-for f in .claude-plugin/plugin.json .claude-plugin/marketplace.json README.md CLAUDE.md GATES.md; do
+for f in README.md CLAUDE.md GATES.md LICENSE docs/explainers/INDEX.md; do
   [ -f "$f" ] && ok "exists: $f" || no "missing: $f"
 done
 for s in scripts/*.sh; do bash -n "$s" 2>/dev/null || no "syntax error in $s"; done
 ok "all shell files parse"
-python3 - <<'PY' && ok "both manifests parse as JSON" || no "a manifest does not parse"
-import json
-json.load(open('.claude-plugin/plugin.json')); json.load(open('.claude-plugin/marketplace.json'))
-PY
 
-echo "== B. manifest fields and self-marketplace =="
-read -r pname pver mname msrc mplug < <(python3 - <<'PY'
-import json
-p=json.load(open('.claude-plugin/plugin.json')); m=json.load(open('.claude-plugin/marketplace.json'))
-print(p.get('name',''), p.get('version',''), m.get('name',''), m['plugins'][0].get('source',''), m['plugins'][0].get('name',''))
-PY
-)
-[ -n "$pname" ] && [[ "$pname" =~ ^[a-z0-9-]+$ ]] && ok "plugin name kebab: $pname" || no "plugin name malformed: '$pname'"
-[ -n "$pver" ] && ok "plugin version present: $pver" || no "plugin version missing"
-[ "$msrc" = "./" ] && ok "marketplace lists this repo as its own source (\"./\")" || no "self-source is '$msrc', expected ./"
-[ "$mplug" = "$pname" ] && ok "marketplace entry name matches plugin.json" || no "name mismatch: marketplace '$mplug' vs plugin '$pname'"
+echo "== B. the web-pack surface =="
+for d in skills/*/; do
+  [ -f "$d/SKILL.md" ] && ok "pack complete: $(basename "$d")/SKILL.md" || no "pack missing SKILL.md: $d"
+done
+grep -qF 'Settings > Features' README.md && ok "README carries the claude.ai upload lane" \
+  || no "README lost the upload lane instructions"
 
 echo "== C. the platform's skill constraints, mechanized =="
 scount=0
@@ -80,9 +71,6 @@ echo "== E. README bindings =="
 r3=$(grep -oE '\*\*[0-9]+ skills\*\*' README.md | head -1 | grep -oE '[0-9]+')
 [[ "$r3" =~ ^[0-9]+$ ]] || r3=-1
 [ "$r3" -eq "$scount" ] && ok "README skill count ($r3) matches the tree ($scount)" || no "README says $r3 skills, tree has $scount"
-vn=$(grep -cF "v$pver" README.md)
-[[ "$vn" =~ ^[0-9]+$ ]] || vn=0
-[ "$vn" -ge 1 ] && ok "README names the manifest version v$pver" || no "README does not name v$pver"
 
 echo "== F. hygiene =="
 abshits=$(git ls-files -z | xargs -0 grep -lF -- "$ABS" 2>/dev/null)
@@ -94,20 +82,46 @@ for ndl in "$CRED1" "$CRED2" "$CRED3" "$CRED4"; do
 done
 [ -z "$credhits" ] && ok "no credential-shaped strings in tracked files" || no "credential shape in:$credhits"
 
-echo "== G. platform acceptance (conditional) =="
-if command -v claude >/dev/null 2>&1; then
-  vout=$(claude plugin validate . 2>&1)
-  if grep -qF "Validation passed" <<<"$vout"; then
-    ok "claude plugin validate: passed"
-  else
-    no "claude plugin validate failed: $(tail -2 <<<"$vout" | tr '\n' ' ')"
-  fi
-else
-  sk "claude CLI absent — platform validate deferred, stated"
-fi
+# S1: the stage-everything publication probe (ported from the parent — this repo flips public at
+# S1B, and an untracked-unignored drop at the root is invisible to every ls-files-based check).
+spout=$(git ls-files --others --exclude-standard 2>/dev/null)
+sprisk=""
+while IFS= read -r pth; do
+  [ -n "$pth" ] || continue
+  sprisk="$sprisk [$pth]"
+done <<<"$spout"
+[ -z "$sprisk" ] && ok "stage-everything probe: zero unignored untracked paths" \
+  || no "publication risk — untracked and NOT ignored:$sprisk"
+grep -qF '.claude/state/' .gitignore && ok "runtime fence present in .gitignore" \
+  || no ".gitignore lost the runtime fence"
+
+echo "== G. zero CLI in shipped skill content (S1 law: executable shapes, never bare verbs) =="
+# Needles are assembled here so this scanner never contains its prey as a contiguous literal.
+g_f1=$(printf '%s%s' '```' 'bash')
+g_f2=$(printf '%s%s' '```' 'sh')
+g_f3=$(printf '%s%s' '```' 'zsh')
+g_c1=$(printf '%s%s' 'chmo' 'd ')
+g_c2=$(printf '%s%s' './scri' 'pts/')
+g_c3=$(printf '%s%s' '/plu' 'gin ')
+g_c4=$(printf '%s%s' 'npx' ' ')
+for d in skills/*/; do
+  s=$(basename "$d")
+  ghits=""
+  for ndl in "$g_f1" "$g_f2" "$g_f3" "$g_c1" "$g_c2" "$g_c3" "$g_c4"; do
+    grep -qF -- "$ndl" "$d/SKILL.md" 2>/dev/null && ghits="$ghits [$ndl]"
+  done
+  [ -z "$ghits" ] && ok "zero CLI content: $s" || no "CLI shape in shipped skill $s:$ghits"
+done
+# The interpreter dependency died with the manifests it parsed. Needle assembled (a scanner
+# never contains its prey); scope = executable surfaces only — ledger prose may DESCRIBE the
+# removal without re-tripping it.
+g_py=$(printf 'pyth%s' 'on3')
+pyh=$(git grep -l -- "$g_py" -- scripts/ skills/ 2>/dev/null | grep -v 'validate-plugins.sh' | tr '\n' ' ')
+[ -z "$pyh" ] && ok "the interpreter dependency is gone from executable surfaces" \
+  || no "interpreter still referenced in:$pyh"
 
 echo "== H. negative controls (existence first, then fire) =="
-for fx in tests/fixtures/bad-skill-name.md tests/fixtures/bad-desc-xml.md; do
+for fx in tests/fixtures/bad-skill-name.md tests/fixtures/bad-desc-xml.md tests/fixtures/bad-cli-content.md; do
   [ -f "$fx" ] && ok "fixture exists: $fx" || no "fixture MISSING (controls would be vacuous): $fx"
 done
 chk_skillfront tests/fixtures/bad-skill-name.md "" \
@@ -117,6 +131,16 @@ chk_skillfront tests/fixtures/bad-desc-xml.md "" \
 chk_skillfront tests/fixtures/does-not-exist.md "" \
   && no "control DID NOT fire: phantom file passed" || ok "control fires: phantom path refused"
 
+
+
+# S1 fire-probe: the zero-CLI arm must catch a planted executable shape (existence asserted above).
+gpfx=tests/fixtures/bad-cli-content.md
+gph=""
+for ndl in "$g_f1" "$g_c1" "$g_c3"; do
+  grep -qF -- "$ndl" "$gpfx" 2>/dev/null && gph="$gph [$ndl]"
+done
+[ -n "$gph" ] && ok "zero-CLI fire-probe: the planted fixture is caught:$gph" \
+  || no "zero-CLI fire-probe FAILED — the planted fixture went unseen; the arm is void"
 
 # S0-RECONCILE — the explainer-epoch discipline, ported from the parent with ONE DECLARED
 # VARIANCE: an empty post-epoch set is PASS-with-reason here (this repo gates rarely, so the

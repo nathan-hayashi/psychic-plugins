@@ -17,3 +17,4 @@ this repo gates rarely, and the epoch row may legitimately be the last row.
 ## Explainers
 
 - [S0-RECONCILE](S0-RECONCILE.md) — license, identity, visibility truth, and this discipline itself.
+- [S1-PLUGINS-WEB](S1-PLUGINS-WEB.md) — the web-only rebuild: zero CLI ships, the manifests retire, the gallery README.

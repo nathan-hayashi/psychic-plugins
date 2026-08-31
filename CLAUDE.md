@@ -16,3 +16,6 @@ path independently requires.
 - **Evidence labels** ([E]/[I]/[S]) on load-bearing claims; weakest claim flagged.
 - **Gate law.** Exact operator tokens in `GATES.md`; commits fronted by `scripts/gate-guard.sh`.
 - **One risk vocabulary:** low | med | high | crit. **No absolute machine paths. Zero credentials.**
+
+Canonical author identity (S0-RECONCILE, 2026-08-31): **Nathan Lim** — LICENSE copyright
+lines cite this form estate-wide; the GitHub handle is an address, not a copyright holder.

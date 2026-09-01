@@ -10,8 +10,8 @@ psychic-crew program where each ran as enforced law before it became advice. Bui
 | `gate-machine` | Run exact-token approval gates as pure ledger discipline: the GATES table, the awaiting→APPROVED stamp ritual, and refusal until the literal token lands. |
 | `unknown-audit` | Label every load-bearing claim `[E]`/`[I]`/`[S]` and surface what an artifact assumes without evidence — report, never silently fix. |
 
-**PRIVATE today.** The audited public flip is its own gate (S1B) — see `GATES.md`. Private at
-creation.
+**PUBLIC since 2026-08-31** (S1B: full-history scan clean, disclosure ruled, then flipped — see
+`GATES.md`). Private at creation.
 
 ## Use in claude.ai chat
 

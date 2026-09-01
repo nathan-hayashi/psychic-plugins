@@ -4,7 +4,7 @@ Portable working-discipline skills for claude.ai chat — prose-first, zero CLI 
 ships (S1-PLUGINS-WEB ruling: the zero-CLI law governs SHIPPED SKILL CONTENT; this repo's own
 validator and gate guard are local development tooling and never ship in a pack). Born
 2026-08-26 under the parent HELIX program's SIDE-2 gate (psychic-crew). Private at creation;
-still private today — the audited public flip is its own gate (S1B).
+public since 2026-08-31 (S1B: scanned, ruled, flipped — see GATES.md).
 
 ## Binding rules
 - **The platform's skill constraints are mechanized here**, not remembered: frontmatter `name`

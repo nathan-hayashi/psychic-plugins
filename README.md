@@ -1,5 +1,7 @@
 # psychic-plugins
 
+![skills](https://img.shields.io/badge/skills-3-2f6f4f)
+
 Working discipline as portable skills — **3 skills**, prose-first, extracted from the
 psychic-crew program where each ran as enforced law before it became advice. Built for
 **claude.ai chat**: no command line anywhere in what ships.
@@ -12,6 +14,24 @@ psychic-crew program where each ran as enforced law before it became advice. Bui
 
 **PUBLIC since 2026-08-31** (S1B: full-history scan clean, disclosure ruled, then flipped — see
 `GATES.md`). Private at creation.
+
+## Three surfaces, one file
+
+```mermaid
+graph TD
+  SK["SKILL.md — prose-first, self-contained"] --> CH["claude.ai chat: zip the folder, upload under Settings > Features"]
+  SK --> CC["Claude Code: drop into a skills directory"]
+  SK --> PP["anywhere: paste the body into the conversation"]
+```
+
+The platform law that shaped this: skills do not sync across surfaces — so the file itself is
+the portable unit, and nothing in it assumes a runtime.
+
+## What is not asserted
+
+Nothing mechanical proves a chat-side session follows a skill's discipline — the suite binds
+what ships (structure, frontmatter constraints, zero-CLI content), not what a remote surface
+does with it. Stated so the green suite is read as what it is.
 
 ## Use in claude.ai chat
 

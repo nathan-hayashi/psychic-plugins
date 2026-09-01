@@ -19,3 +19,4 @@ this repo gates rarely, and the epoch row may legitimately be the last row.
 - [S0-RECONCILE](S0-RECONCILE.md) — license, identity, visibility truth, and this discipline itself.
 - [S1-PLUGINS-WEB](S1-PLUGINS-WEB.md) — the web-only rebuild: zero CLI ships, the manifests retire, the gallery README.
 - [S1B-PUBLIC](S1B-PUBLIC.md) — the audited flip: full-history scan, the disclosure ruling, then public.
+- [S5-README-UX](S5-README-UX.md) — three-surfaces diagram, bound badge, every-occurrence rewrite.

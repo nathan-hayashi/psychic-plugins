@@ -68,9 +68,17 @@ dn=$(grep -cF "$DOC" "skills/gate-machine/SKILL.md")
 [ "$dn" -eq 0 ] && ok "gate-machine carries no doctrine line (exempt by declaration)" || no "doctrine leaked into gate-machine"
 
 echo "== E. README bindings =="
-r3=$(grep -oE '\*\*[0-9]+ skills\*\*' README.md | head -1 | grep -oE '[0-9]+')
-[[ "$r3" =~ ^[0-9]+$ ]] || r3=-1
-[ "$r3" -eq "$scount" ] && ok "README skill count ($r3) matches the tree ($scount)" || no "README says $r3 skills, tree has $scount"
+r3v=$(grep -oE '\*\*[0-9]+ skills\*\*|badge/skills-[0-9]+' README.md | grep -oE '[0-9]+' | sort -u)
+r3n=$(grep -c . <<<"$r3v"); [[ "$r3n" =~ ^[0-9]+$ ]] || r3n=0
+{ [ "$r3n" -eq 1 ] && [ "$r3v" = "$scount" ]; } \
+  && ok "README skill count bound every-occurrence incl. the badge ($r3v == tree $scount)" \
+  || no "README skill binding broken: distinct values [$(tr '\n' ' ' <<<"$r3v")] vs tree $scount"
+ecp=$(mktemp); cat README.md > "$ecp"; printf '\nbadge/skills-99\n' >> "$ecp"
+e2v=$(grep -oE '\*\*[0-9]+ skills\*\*|badge/skills-[0-9]+' "$ecp" | grep -oE '[0-9]+' | sort -u | grep -c .)
+[[ "$e2v" =~ ^[0-9]+$ ]] || e2v=0
+[ "$e2v" -ge 2 ] && ok "control fires: a conflicting badge count reaches the extractor" \
+  || no "every-occurrence control DID NOT fire"
+rm -f "$ecp"
 
 echo "== F. hygiene =="
 abshits=$(git ls-files -z | xargs -0 grep -lF -- "$ABS" 2>/dev/null)
